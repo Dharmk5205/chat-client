@@ -46,30 +46,38 @@ const Login = () => {
     if (!validateEmail(email)) return toast.error('Invalid email');
     if (!validatePassword(password)) return toast.error('Password must be at least 6 characters');
 
+    const loadingToast = toast.loading(isRegistering ? 'Registering...' : 'Logging in...');
+
     try {
       if (isRegistering) {
-        if (!fullName || !username) return toast.error('Full name and username are required.');
+        if (!fullName || !username) {
+          toast.dismiss(loadingToast);
+          return toast.error('Full name and username are required.');
+        }
+
         const res = await API.post('/auth/register', {
           fullName,
           username,
           email,
           password,
         });
+
         localStorage.setItem('token', res.data.token);
         localStorage.setItem('user', JSON.stringify(res.data.user));
+        toast.dismiss(loadingToast);
         toast.success('Account created successfully!');
-        // ✅ Only registration goes to setavatar
         setTimeout(() => navigate('/setavatar'), 1000);
       } else {
         const res = await API.post('/auth/login', { email, password });
         const user = res.data.user;
         localStorage.setItem('token', res.data.token);
         localStorage.setItem('user', JSON.stringify(user));
+        toast.dismiss(loadingToast);
         toast.success('Login successful!');
-        // ✅ Always navigate to home after login
         setTimeout(() => navigate('/home'), 1000);
       }
     } catch (err) {
+      toast.dismiss(loadingToast);
       toast.error(err.response?.data?.message || 'Something went wrong.');
     }
   };
