@@ -1,7 +1,7 @@
 // src/api.js
 import axios from "axios";
 const API = axios.create({
-  baseURL: "https://chat-server-m8j6.onrender.com/",
+  baseURL: "https://chat-server-m8j6.onrender.com/api",
 });
 
 API.interceptors.request.use((req) => {
